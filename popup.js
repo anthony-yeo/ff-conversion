@@ -1,43 +1,59 @@
 document.addEventListener("DOMContentLoaded", () => {
-  chrome.storage.local.get("selectedText", data => {
-    if (data.selectedText) {
-      document.getElementById("input").value = data.selectedText;
-      chrome.storage.local.remove("selectedText");
-    }
-  });
+  const inputField = document.getElementById("input");
+  const unitField = document.getElementById("unit");
+  const output = document.getElementById("output");
 
-  document.getElementById("convert").addEventListener("click", () => {
-    const rawText = document.getElementById("input").value;
-    const targetUnit = document.getElementById("unit").value.trim().toLowerCase();
+  const updateConversion = () => {
+    const rawText = inputField.value;
+    const targetUnit = unitField.value;
 
-    const output = document.getElementById("output");
     const converted = convertMeasurements(rawText, targetUnit);
 
     if (converted.length > 0) {
       output.textContent = converted.join(" × ") + " " + targetUnit;
     } else {
-      output.textContent = "Invalid input or unsupported unit.";
+      output.textContent = "–";
     }
-  });
-});
-
-function convertMeasurements(text, targetUnit) {
-  const mmTo = {
-    in: mm => mm / 25.4,
-    ft: mm => mm / 304.8,
-    cm: mm => mm / 10,
-    m: mm => mm / 1000
   };
 
-  const converter = mmTo[targetUnit];
-  if (!converter) return [];
+  inputField.addEventListener("input", updateConversion);
+  unitField.addEventListener("change", updateConversion);
+});
 
-  const parts = text.match(/[\d.]+/g);
-  if (!parts) return [];
+function convertMeasurements(input, targetUnit) {
+  const toMillimeters = {
+    mm: val => val,
+    cm: val => val * 10,
+    m:  val => val * 1000,
+    in: val => val * 25.4,
+    ft: val => val * 304.8
+  };
 
-  return parts.map(num => {
-    const mm = parseFloat(num);
-    if (isNaN(mm)) return "?";
-    return converter(mm).toFixed(2);
+  const fromMillimeters = {
+    mm: mm => mm,
+    cm: mm => mm / 10,
+    m:  mm => mm / 1000,
+    in: mm => mm / 25.4,
+    ft: mm => mm / 304.8
+  };
+
+  const normalize = str => str.trim().toLowerCase().replace(/×/g, "x");
+
+  const parts = normalize(input).split(/x/);
+
+  const values = parts.map(part => {
+    const match = part.match(/([\d.]+)\s*(mm|cm|in|ft|m)?/i);
+    if (!match) return null;
+
+    const value = parseFloat(match[1]);
+    let unit = match[2] ? match[2].toLowerCase() : "mm"; // default if no unit
+
+    if (isNaN(value) || !toMillimeters[unit]) return null;
+
+    const mm = toMillimeters[unit](value);
+    const converted = fromMillimeters[targetUnit](mm);
+    return converted.toFixed(2);
   });
+
+  return values.every(v => v !== null) ? values : [];
 }

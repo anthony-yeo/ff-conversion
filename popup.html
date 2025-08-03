@@ -1,15 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>Measurement Converter</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h3>Measurement Converter</h3>
-  <textarea id="input" rows="3" placeholder="e.g., 55 x 22 mm"></textarea>
-  <input type="text" id="unit" placeholder="Target unit (e.g., in, ft, cm)" />
-  <button id="convert">Convert</button>
-  <p><strong>Result:</strong> <span id="output">–</span></p>
+  <h2>Measurement Converter</h2>
+
+  <textarea id="input" placeholder="e.g., 55 x 33 x 22 mm" rows="3"></textarea>
+
+  <select id="unit">
+    <option value="in">inches</option>
+    <option value="ft">feet</option>
+    <option value="cm">centimeters</option>
+    <option value="m">meters</option>
+  </select>
+
+  <p><strong>Result:</strong></p>
+  <div id="output">–</div>
+
   <script src="popup.js"></script>
 </body>
 </html>
