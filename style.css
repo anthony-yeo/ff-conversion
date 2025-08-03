@@ -1,0 +1,16 @@
+body {
+  font-family: sans-serif;
+  width: 300px;
+  padding: 10px;
+}
+textarea, input {
+  width: 100%;
+  margin-bottom: 10px;
+}
+button {
+  width: 100%;
+}
+#output {
+  display: block;
+  margin-top: 10px;
+}
